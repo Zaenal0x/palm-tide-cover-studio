@@ -1,181 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PALM TIDE Cover Studio — GTA-style cover art maker</title>
+<title>PALM TIDE Cover Studio</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">PALM TIDE</span>
-    <span class="brand-sub">COVER STUDIO</span>
-  </div>
-  <div class="variants" role="group" aria-label="Cover variants">
-    <span class="group-label">Variant</span>
-    <button type="button" class="btn chip active" data-variant="sunset">Sunset</button>
-    <button type="button" class="btn chip" data-variant="neon">Neon Night</button>
-    <button type="button" class="btn chip" data-variant="comic">Comic Ink</button>
-  </div>
-  <div class="history">
-    <button type="button" class="btn" id="btnUndo" disabled>↩ Undo</button>
-    <button type="button" class="btn" id="btnRedo" disabled>↪ Redo</button>
-  </div>
-</header>
-
-<main class="layout3">
-  <aside class="col" id="photoCol">
-    <section class="block">
-      <div class="block-head">
-        <h2>Photos</h2>
-        <span class="count" id="photoCount">0 LOADED</span>
-      </div>
-      <div class="thumb-grid" id="photoGrid"></div>
-      <button type="button" class="btn wide" id="btnUpload">+ Add your photos</button>
-      <p class="hint">…or drop image files anywhere on this column or the cover. Photos never leave your machine.</p>
-      <div class="row">
-        <button type="button" class="btn grow" id="btnFillAll">Fill all panels</button>
-        <button type="button" class="btn grow" id="btnSpread">Spread photos</button>
-      </div>
-    </section>
-
-    <section class="block">
-      <h2>Panels</h2>
-      <div class="chip-wrap" id="panelList"></div>
-      <h3 id="selPanelName">PANEL 1 OF 4</h3>
-      <label class="field">
-        <span>Photo in this panel</span>
-        <select id="selPhoto"></select>
-      </label>
-      <label class="field">
-        <span>Location — place</span>
-        <input type="text" id="tagPlace" maxlength="28">
-      </label>
-      <div class="row">
-        <label class="field grow">
-          <span>Time</span>
-          <input type="text" id="tagTime" maxlength="10">
-        </label>
-        <label class="field grow">
-          <span>Sub-line</span>
-          <input type="text" id="tagSub" maxlength="30">
-        </label>
-      </div>
-      <button type="button" class="btn wide" id="btnResetCrop">Reset crop</button>
-      <p class="hint">On the cover: drag a panel to reposition its photo, scroll to zoom, double-click to reset.</p>
-    </section>
-  </aside>
-
-  <section class="stage">
-    <div class="stage-bar">
-      <div class="sizes" role="group" aria-label="Post size">
-        <button type="button" class="btn chip" data-size="square">1080 × 1080</button>
-        <button type="button" class="btn chip" data-size="portrait">1080 × 1350</button>
-        <button type="button" class="btn chip active" data-size="landscape">1920 × 1080</button>
-      </div>
-      <div class="row">
-        <button type="button" class="btn cta" id="btnExport">EXPORT PNG 1920 × 1080</button>
-        <button type="button" class="btn" id="btnExportAll">Export all 3 sizes</button>
-      </div>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-script">Palm Tide</span>
+      <span class="brand-block">COVER STUDIO</span>
     </div>
-    <div class="canvas-wrap" id="canvasWrap">
-      <canvas id="preview" width="1150" height="647"></canvas>
+    <div class="variants" role="group" aria-label="Cover variants">
+      <button class="btn" data-variant="sunset" type="button">Sunset</button>
+      <button class="btn" data-variant="neon" type="button">Neon Night</button>
+      <button class="btn" data-variant="comic" type="button">Comic Ink</button>
     </div>
-    <p class="stage-note">Every photo is graded the moment it lands in a panel — duotone gradient map, halftone screen and poster ink — so the cover reads as one piece of poster art.</p>
-  </section>
+    <div class="exports">
+      <button class="btn" id="undoBtn" type="button">Undo</button>
+      <button class="btn" id="redoBtn" type="button">Redo</button>
+      <button class="btn accent" id="exportBtn" type="button">Export PNG</button>
+      <button class="btn accent" id="exportAllBtn" type="button">Export All 3 Sizes</button>
+    </div>
+  </header>
 
-  <aside class="col">
-    <section class="block">
-      <h2>Layout</h2>
-      <div class="chip-wrap" id="layoutBtns"></div>
+  <main class="workspace">
+    <aside class="tray panel">
+      <h2>Photos</h2>
+      <label class="btn block upload-btn">
+        Add photos
+        <input id="fileInput" type="file" accept="image/*" multiple hidden>
+      </label>
+      <p class="hint">…or drop image files onto the cover.</p>
+      <div id="thumbs" class="thumbs"></div>
+      <h3>Selected photo</h3>
+      <button class="btn block" id="fillAllBtn" type="button">Fill all panels with it</button>
+      <button class="btn block" id="spreadBtn" type="button">Spread photos across panels</button>
+      <p class="hint">Click a panel on the cover to select it. Drag to move its
+      photo, scroll to zoom, double-click to reset the crop.</p>
+    </aside>
+
+    <section class="stage panel" id="stage">
+      <canvas id="cover" width="1920" height="1080"></canvas>
     </section>
 
-    <section class="block">
-      <h2>Photo grade</h2>
-      <div class="chip-wrap" id="gradeBtns"></div>
-      <label class="slider">
-        <span>Grade strength <b id="strengthVal">0.90</b></span>
-        <input type="range" id="inStrength" min="0" max="1" step="0.01" value="0.9">
+    <aside class="controls panel">
+      <h2>Cover</h2>
+      <label class="field">Layout
+        <select id="layoutSel"></select>
       </label>
-      <label class="slider">
-        <span>Contrast <b id="contrastVal">0.12</b></span>
-        <input type="range" id="inContrast" min="-0.4" max="0.6" step="0.01" value="0.12">
+      <label class="field">Grade
+        <select id="gradeSel"></select>
       </label>
-      <label class="slider">
-        <span>Saturation <b id="saturationVal">0.18</b></span>
-        <input type="range" id="inSaturation" min="-0.5" max="0.8" step="0.01" value="0.18">
+      <label class="field">Export size
+        <select id="sizeSel">
+          <option value="landscape">Landscape · 1920×1080</option>
+          <option value="square">Square · 1080×1080</option>
+          <option value="portrait">Portrait · 1080×1350</option>
+        </select>
       </label>
-      <label class="slider">
-        <span>Grain <b id="grainVal">0.30</b></span>
-        <input type="range" id="inGrain" min="0" max="1" step="0.01" value="0.3">
-      </label>
-      <label class="slider">
-        <span>Vignette <b id="vignetteVal">0.45</b></span>
-        <input type="range" id="inVignette" min="0" max="1" step="0.01" value="0.45">
-      </label>
-      <label class="check">
-        <input type="checkbox" id="inHalftone" checked>
-        <span>Halftone print dots</span>
-      </label>
-      <label class="slider">
-        <span>Halftone amount <b id="halftoneAmtVal">0.55</b></span>
-        <input type="range" id="inHalftoneAmt" min="0" max="1" step="0.01" value="0.55">
-      </label>
-    </section>
 
-    <section class="block">
-      <h2>Caption &amp; furniture</h2>
-      <label class="field">
-        <span>Title</span>
-        <input type="text" id="inTitle" maxlength="24">
-      </label>
-      <label class="field">
-        <span>Script subtitle</span>
-        <input type="text" id="inSubtitle" maxlength="40">
-      </label>
-      <label class="field">
-        <span>Tagline (bottom strip)</span>
-        <input type="text" id="inTagline" maxlength="48">
-      </label>
-      <label class="field">
-        <span>Quote</span>
-        <input type="text" id="inQuote" maxlength="90">
-      </label>
-      <label class="field">
-        <span>Quote source</span>
-        <input type="text" id="inQuoteSource" maxlength="30">
-      </label>
-      <div class="row">
-        <label class="field grow">
-          <span>Badge</span>
-          <input type="text" id="inBadge" maxlength="24">
-        </label>
-        <label class="field grow">
-          <span>Volume</span>
-          <input type="text" id="inVolume" maxlength="10">
-        </label>
-      </div>
-      <label class="field">
-        <span>Ribbon</span>
-        <input type="text" id="inRibbon" maxlength="24">
-      </label>
-      <div class="row">
-        <label class="field grow">
-          <span>HUD word</span>
-          <input type="text" id="inHud" maxlength="12">
-        </label>
-        <label class="slider grow">
-          <span>Stars <b id="starsVal">5</b></span>
-          <input type="range" id="inStars" min="0" max="8" step="1" value="5">
-        </label>
-      </div>
-    </section>
-  </aside>
-</main>
+      <h3>Grade strength</h3>
+      <label class="slider">Strength <input id="strengthR" type="range" min="0" max="1" step="0.01"></label>
+      <label class="slider">Contrast <input id="contrastR" type="range" min="0.6" max="1.5" step="0.01"></label>
+      <label class="slider">Saturation <input id="saturationR" type="range" min="0" max="2" step="0.01"></label>
+      <label class="slider">Grain <input id="grainR" type="range" min="0" max="1" step="0.01"></label>
+      <label class="slider">Vignette <input id="vignetteR" type="range" min="0" max="1" step="0.01"></label>
+      <label class="check"><input id="halftoneC" type="checkbox"> Halftone dots</label>
+      <label class="slider">Dots <input id="dotsR" type="range" min="0" max="1" step="0.01"></label>
 
-<canvas id="shotCanvas" hidden></canvas>
-<input type="file" id="fileInput" accept="image/*" multiple hidden>
-<script type="module" src="src/studio.js"></script>
+      <h3>Words</h3>
+      <label class="field">Title <input id="titleI" type="text"></label>
+      <label class="field">Script subtitle <input id="subtitleI" type="text"></label>
+      <label class="field">Tagline <input id="taglineI" type="text"></label>
+      <label class="field">Quote <input id="quoteI" type="text"></label>
+      <label class="field">Quote source <input id="sourceI" type="text"></label>
+      <label class="field">Badge <input id="badgeI" type="text"></label>
+      <label class="field">Ribbon <input id="ribbonI" type="text"></label>
+      <label class="field">Volume tag <input id="volumeI" type="text"></label>
+      <label class="field">Stars
+        <select id="starsSel">
+          <option>1</option><option>2</option><option>3</option>
+          <option>4</option><option selected>5</option>
+        </select>
+      </label>
+
+      <h3>Panel tag · <span id="tagPanelName">none</span></h3>
+      <label class="field">Place <input id="tagPlaceI" type="text"></label>
+      <label class="field">Time <input id="tagTimeI" type="text"></label>
+      <label class="field">Sub-line <input id="tagSubI" type="text"></label>
+    </aside>
+  </main>
+</div>
+<script type="module" src="src/desk.js"></script>
 </body>
 </html>
