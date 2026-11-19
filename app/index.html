@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALM TIDE Cover Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">PALM TIDE <span>Cover Studio</span></div>
+  <div id="variantBtns" class="variant-row" aria-label="Cover variants"></div>
+  <div class="top-actions">
+    <button type="button" id="btnUndo" class="btn">Undo</button>
+    <button type="button" id="btnRedo" class="btn">Redo</button>
+    <button type="button" id="expSquare" class="btn">PNG 1080×1080</button>
+    <button type="button" id="expPortrait" class="btn">PNG 1080×1350</button>
+    <button type="button" id="expLand" class="btn">PNG 1920×1080</button>
+    <button type="button" id="expAll" class="btn btn-accent">Export All 3 Sizes</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="col tray">
+    <h2>Photos</h2>
+    <div id="trayList"></div>
+    <button type="button" id="btnUpload" class="btn btn-accent btn-block">Upload photos</button>
+    <p class="hint">…or drop image files anywhere in the window. Click a photo to send it to the selected panel.</p>
+  </aside>
+
+  <section class="col stage" id="stage">
+    <canvas id="cover" width="880" height="1100"></canvas>
+    <p class="hint">Drag a photo inside its panel · scroll to zoom · double-click to reset the crop</p>
+  </section>
+
+  <aside class="col controls">
+    <h2>Layout</h2>
+    <div id="layoutBtns" class="chip-grid"></div>
+
+    <h2>Grade — applied to every photo</h2>
+    <div id="gradeBtns" class="chip-grid"></div>
+
+    <h2>Print look</h2>
+    <div id="sliders"></div>
+    <label class="check-row"><input type="checkbox" id="optHalftone"> Halftone dot screen</label>
+
+    <h2>Words</h2>
+    <div id="fields"></div>
+    <label class="field-row"><span>WANTED stars</span>
+      <select id="optStars">
+        <option>0</option><option>1</option><option>2</option>
+        <option>3</option><option>4</option><option selected>5</option>
+      </select>
+    </label>
+
+    <h2 id="selLabel">Panel</h2>
+    <label class="field-row"><span>Place</span><input type="text" id="tagPlace"></label>
+    <label class="field-row"><span>Time</span><input type="text" id="tagTime"></label>
+    <label class="field-row"><span>Sub-line</span><input type="text" id="tagSub"></label>
+    <div class="btn-row">
+      <button type="button" id="btnFillAll" class="btn">Fill all panels</button>
+      <button type="button" id="btnSpread" class="btn">Spread photos</button>
+      <button type="button" id="btnClearPanel" class="btn">Clear panel</button>
+    </div>
+  </aside>
+</main>
+
+<input type="file" id="fileInput" accept="image/*" multiple hidden>
+<script type="module" src="src/studio.js"></script>
+</body>
+</html>
