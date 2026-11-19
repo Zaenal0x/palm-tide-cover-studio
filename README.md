@@ -1,8 +1,8 @@
 # PALM TIDE Cover Studio
 
-[![make.fun bounty](https://img.shields.io/badge/make.fun-bounty-7a1c50)](https://make.fun/bounty/gta6-cover-art-01)
-[![prize](https://img.shields.io/badge/prize-%24250-gold)](https://make.fun/bounty/gta6-cover-art-01)
-[![deadline](https://img.shields.io/badge/deadline-Nov%2021%2C%202026-blue)](https://make.fun/bounty/gta6-cover-art-01)
+[![make.fun bounty](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/Zaenal0x/palm-tide-cover-studio/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/Zaenal0x/palm-tide-cover-studio/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
 An offline web app that turns your photos and a caption into GTA 6-style
 multi-panel poster cover art, exported as a PNG to share. It was built for
