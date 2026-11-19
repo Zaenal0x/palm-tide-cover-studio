@@ -1,102 +1,131 @@
-// PALM TIDE Cover Studio — a gta6-cover-art-01 entry (Node 22, standard library only).
+// PALM TIDE Cover Studio — entry point.
 //
-// The app is this directory's app/ folder: plain static files a desktop browser loads
-// offline (app/index.html and its ES modules, no library, no network request). This
-// program hands the entry in: it validates the files against the scorer's caps, copies
-// app/ and screenshots/ from beside this file to /output, writes /output/dossier.json
-// with the vendored make.fun library, and logs a manifest of everything it shipped.
-//
-// Serve the app locally with `node serve.ts`, then open http://localhost:8080.
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// Running `node main.ts` packages the entry: it validates the app and
+// the screenshots against the bounty's caps, copies app/ and
+// screenshots/ into $MAKEFUN_OUTPUT_DIR (default /output) and writes
+// the dossier.json the scorer expects, using the vendored
+// buildDossier so the bytes match the gate's own computation.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
 
-const here = fileURLToPath(new URL('.', import.meta.url));
-const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const CAPS = {
+  text_max_bytes: 163840,
+  screenshots: { max: 4, max_bytes: 262144 },
+  app_max_files: 993,
+  app_max_bytes: 50331648,
+  app_path_max_bytes: 1000,
+};
+const SCREENSHOT_MIN = 3;
+const INDEX_MAX_BYTES = 1024 * 1024;
+const DOSSIER_LIMIT_BYTES = 1572864; // 1.5 MiB, this entry's own cap
 
-// The scorer's caps (reference/gate.json), checked up front so a bad entry fails
-// here with a readable message instead of inside the grader: 3 or 4 screenshots of
-// at most 256 KiB each, an app/ tree of at most 993 entries and 48 MiB in all.
-const SCREENSHOT_MAX = 4;
-const SCREENSHOT_MAX_BYTES = 262144;
-const APP_MAX_FILES = 993;
-const APP_MAX_BYTES = 50331648;
+interface FoundFile {
+  rel: string;
+  bytes: number;
+}
 
-function walkFiles(dir: string, base: string, acc: { path: string; bytes: number }[]): void {
+function walk(dir: string, base: string, out: FoundFile[]): FoundFile[] {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
-    const rel = base ? `${base}/${name}` : name;
-    const stats = statSync(full);
-    if (stats.isDirectory()) walkFiles(full, rel, acc);
-    else acc.push({ path: rel, bytes: stats.size });
-  }
-}
-
-function validateEntry(): { path: string; bytes: number }[] {
-  const appDir = join(here, 'app');
-  if (!existsSync(join(appDir, 'index.html'))) {
-    throw new Error('app/index.html is missing: the app cannot be handed in without it');
-  }
-  const appFiles: { path: string; bytes: number }[] = [];
-  walkFiles(appDir, 'app', appFiles);
-  const appBytes = appFiles.reduce((sum, f) => sum + f.bytes, 0);
-  if (appFiles.length > APP_MAX_FILES) {
-    throw new Error(`app/ holds ${appFiles.length} files, over the ${APP_MAX_FILES} cap`);
-  }
-  if (appBytes > APP_MAX_BYTES) {
-    throw new Error(`app/ is ${appBytes} bytes, over the ${APP_MAX_BYTES} byte cap`);
-  }
-  const shotsDir = join(here, 'screenshots');
-  const shots = existsSync(shotsDir)
-    ? readdirSync(shotsDir).filter((n) => !n.startsWith('.') && /\.(png|jpe?g)$/i.test(n))
-    : [];
-  if (shots.length < 3 || shots.length > SCREENSHOT_MAX) {
-    throw new Error(`screenshots/ holds ${shots.length} images; the gate wants 3 or 4`);
-  }
-  for (const name of shots) {
-    const bytes = statSync(join(shotsDir, name)).size;
-    if (bytes > SCREENSHOT_MAX_BYTES) {
-      throw new Error(`screenshots/${name} is ${bytes} bytes, over the ${SCREENSHOT_MAX_BYTES} byte cap`);
+    const st = statSync(full);
+    if (st.isDirectory()) {
+      walk(full, base, out);
+    } else if (st.isFile()) {
+      out.push({ rel: relative(base, full).split(sep).join('/'), bytes: st.size });
     }
   }
-  return appFiles;
+  return out;
 }
 
-const appFiles = validateEntry();
-
-mkdirSync(out, { recursive: true });
-cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
-mkdirSync(join(out, 'screenshots'), { recursive: true });
-if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
-
-// The dossier is built with the same caps object the starter used: only
-// text_max_bytes shapes the bytes; the rest restate the scorer's own limits,
-// which validateEntry() has already checked in this program's own words.
-const dossier = buildDossier(out, {
-  text_max_bytes: 163840,
-  screenshots: { max: SCREENSHOT_MAX, max_bytes: SCREENSHOT_MAX_BYTES },
-  app_max_files: APP_MAX_FILES,
-  app_max_bytes: APP_MAX_BYTES,
-  app_path_max_bytes: 1000,
-});
-writeFileSync(join(out, 'dossier.json'), dossier);
-
-// Manifest: every file this run put in /output, with its size, so the log of
-// a grading run shows exactly what was handed in.
-const shipped: { path: string; bytes: number }[] = [];
-walkFiles(join(out, 'app'), 'app', shipped);
-walkFiles(join(out, 'screenshots'), 'screenshots', shipped);
-shipped.push({ path: 'dossier.json', bytes: Buffer.byteLength(dossier) });
-shipped.sort((a, b) => a.path.localeCompare(b.path));
-let total = 0;
-for (const f of shipped) {
-  total += f.bytes;
-  console.log(`  ${f.path} — ${f.bytes} bytes`);
+function isImage(name: string): boolean {
+  const lower = name.toLowerCase();
+  return lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png');
 }
-console.log(
-  `PALM TIDE handed in: ${appFiles.length} app files, ${shipped.length} files in ${out}, ${total} bytes in all.`,
-);
+
+// Refuse early, with the fix named, when the entry would break a cap
+// the scorer enforces anyway.
+function preflight(root: string): void {
+  const problems: string[] = [];
+  const appDir = join(root, 'app');
+  const shotsDir = join(root, 'screenshots');
+  if (!existsSync(join(appDir, 'index.html'))) {
+    problems.push('app/index.html is missing');
+  }
+  const appFiles = walk(appDir, appDir, []);
+  if (appFiles.length > CAPS.app_max_files) {
+    problems.push('app/ holds ' + appFiles.length + ' files, over the ' + CAPS.app_max_files + ' cap');
+  }
+  let appBytes = 0;
+  for (const f of appFiles) {
+    appBytes += f.bytes;
+    if (Buffer.byteLength(f.rel) > CAPS.app_path_max_bytes) {
+      problems.push('app path too long: ' + f.rel);
+    }
+    if (f.rel === 'index.html' && f.bytes > INDEX_MAX_BYTES) {
+      problems.push('app/index.html is ' + f.bytes + ' bytes, over the 1 MiB cap');
+    }
+  }
+  if (appBytes > CAPS.app_max_bytes) {
+    problems.push('app/ totals ' + appBytes + ' bytes, over the ' + CAPS.app_max_bytes + ' cap');
+  }
+  const shots = walk(shotsDir, shotsDir, []).filter((f) => isImage(f.rel));
+  if (shots.length < SCREENSHOT_MIN || shots.length > CAPS.screenshots.max) {
+    problems.push('screenshots/ holds ' + shots.length + ' images; the bounty wants 3 or 4');
+  }
+  for (const s of shots) {
+    if (s.bytes > CAPS.screenshots.max_bytes) {
+      problems.push('screenshot ' + s.rel + ' is ' + s.bytes + ' bytes, over the 256 KiB cap');
+    }
+  }
+  if (problems.length) {
+    throw new Error('pre-flight failed:\n  - ' + problems.join('\n  - '));
+  }
+  console.log(
+    'pre-flight ok: ' + appFiles.length + ' app files, ' +
+    appBytes + ' app bytes, ' + shots.length + ' screenshots within caps',
+  );
+}
+
+function main(): void {
+  const root = dirname(fileURLToPath(import.meta.url));
+  const outDir = process.env.MAKEFUN_OUTPUT_DIR || '/output';
+  preflight(root);
+
+  mkdirSync(outDir, { recursive: true });
+  for (const part of ['app', 'screenshots']) {
+    const dest = join(outDir, part);
+    if (existsSync(dest)) rmSync(dest, { recursive: true, force: true });
+    cpSync(join(root, part), dest, { recursive: true });
+  }
+
+  const dossier = buildDossier(outDir, CAPS);
+  if (dossier.byteLength > DOSSIER_LIMIT_BYTES) {
+    throw new Error('dossier.json would be ' + dossier.byteLength + ' bytes, over the 1.5 MiB cap');
+  }
+  writeFileSync(join(outDir, 'dossier.json'), dossier);
+
+  // Manifest: every file that just landed in the output, with its
+  // size, so a packaged run can be eyeballed against the caps at a
+  // glance and diffed against the next run.
+  const written = walk(outDir, outDir, []).sort((a, b) => (a.rel < b.rel ? -1 : 1));
+  let total = 0;
+  console.log('--- output manifest (' + outDir + ') ---');
+  for (const f of written) {
+    total += f.bytes;
+    console.log('  ' + f.rel + '  ' + f.bytes + ' bytes');
+  }
+  console.log('--- ' + written.length + ' files, ' + total + ' bytes total ---');
+}
+
+main();
