@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALM TIDE Cover Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">PALM TIDE <span>Cover Studio</span></div>
+  <div class="top-actions">
+    <button id="undoBtn" class="btn" type="button">↩ Undo</button>
+    <button id="redoBtn" class="btn" type="button">↪ Redo</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="col photos-col">
+    <h2>Photos</h2>
+    <div id="dropZone" class="drop-zone">
+      <p>Drop photos here<br>or</p>
+      <button id="uploadBtn" class="btn accent" type="button">Add photos</button>
+      <input id="fileInput" type="file" accept="image/*" multiple hidden>
+    </div>
+    <div class="row">
+      <button id="fillAllBtn" class="btn" type="button">Fill all panels</button>
+      <button id="spreadBtn" class="btn" type="button">Spread photos</button>
+    </div>
+    <p class="hint">Click a photo to put it in the selected panel. Drag on the cover to reposition, scroll to zoom, double-click to reset.</p>
+    <div id="thumbs" class="thumbs"></div>
+  </aside>
+
+  <section class="col stage-col">
+    <canvas id="stage" width="1080" height="1080"></canvas>
+    <div class="export-row">
+      <button class="btn accent" type="button" data-export="1080x1080">PNG 1080×1080</button>
+      <button class="btn accent" type="button" data-export="1080x1350">PNG 1080×1350</button>
+      <button class="btn accent" type="button" data-export="1920x1080">PNG 1920×1080</button>
+      <button id="exportAllBtn" class="btn" type="button">Export all</button>
+    </div>
+  </section>
+
+  <aside class="col controls-col">
+    <h2>Variant</h2>
+    <div class="row" id="variantRow">
+      <button class="btn chip" type="button" data-variant="sunset">Sunset</button>
+      <button class="btn chip" type="button" data-variant="neon">Neon Night</button>
+      <button class="btn chip" type="button" data-variant="comic">Comic Ink</button>
+    </div>
+
+    <h2>Layout</h2>
+    <div class="row wrap" id="layoutRow"></div>
+
+    <h2>Grade</h2>
+    <select id="gradeSelect" class="field"></select>
+    <label class="check"><input id="halftoneChk" type="checkbox" checked> Halftone dots</label>
+
+    <div id="sliders"></div>
+
+    <h2>Captions</h2>
+    <div id="captionFields"></div>
+
+    <h2>Panel tag</h2>
+    <p class="hint" id="selectedLabel">Panel 1 selected</p>
+    <label class="lab">Place<input id="tagPlace" class="field" type="text"></label>
+    <label class="lab">Time<input id="tagTime" class="field" type="text"></label>
+    <label class="lab">Sub-line<input id="tagSub" class="field" type="text"></label>
+  </aside>
+</main>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
