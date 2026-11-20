@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALM TIDE Cover Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">PALM TIDE <span>COVER STUDIO</span></div>
+  <div class="variants" role="group" aria-label="Cover variants">
+    <button class="btn" data-variant="sunset">Sunset Mosaic</button>
+    <button class="btn" data-variant="neon">Neon Night</button>
+    <button class="btn" data-variant="comic">Comic Ink</button>
+  </div>
+  <div class="exportbox">
+    <select id="sizeSel" class="field">
+      <option value="1920x1080">1920 × 1080</option>
+      <option value="1080x1080">1080 × 1080</option>
+      <option value="1080x1350">1080 × 1350</option>
+    </select>
+    <button class="btn accent" id="exportBtn">Export PNG</button>
+    <button class="btn" id="exportAllBtn">Export All</button>
+  </div>
+</header>
+
+<main class="grid">
+  <aside class="col photos">
+    <h2>Photos</h2>
+    <button class="btn accent block" id="uploadBtn">Upload photos</button>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    <p class="hint" id="dropHint">…or drop image files anywhere on this panel. Click a photo, then click a panel — or use the buttons below.</p>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row">
+      <button class="btn" id="fillAllBtn">Fill all panels</button>
+      <button class="btn" id="spreadBtn">Spread photos</button>
+    </div>
+    <h2>History</h2>
+    <div class="row">
+      <button class="btn" id="undoBtn">Undo</button>
+      <button class="btn" id="redoBtn">Redo</button>
+    </div>
+    <p class="hint">Drag on a panel to reposition its photo, scroll to zoom, double-click to reset the crop.</p>
+  </aside>
+
+  <section class="col stage">
+    <canvas id="stageCanvas" width="960" height="540"></canvas>
+    <p class="hint center" id="panelLabel">Panel 1 selected</p>
+  </section>
+
+  <aside class="col controls">
+    <h2>Layout &amp; Grade</h2>
+    <label class="lab">Layout
+      <select id="layoutSel" class="field"></select>
+    </label>
+    <label class="lab">Photo grade
+      <select id="gradeSel" class="field"></select>
+    </label>
+    <label class="lab">Grade strength <span class="val" id="vStrength"></span>
+      <input type="range" id="sStrength" min="0" max="1" step="0.01">
+    </label>
+    <label class="lab">Contrast <span class="val" id="vContrast"></span>
+      <input type="range" id="sContrast" min="0.6" max="1.5" step="0.01">
+    </label>
+    <label class="lab">Saturation <span class="val" id="vSat"></span>
+      <input type="range" id="sSat" min="0" max="2" step="0.01">
+    </label>
+    <label class="lab">Grain <span class="val" id="vGrain"></span>
+      <input type="range" id="sGrain" min="0" max="1" step="0.01">
+    </label>
+    <label class="lab">Vignette <span class="val" id="vVig"></span>
+      <input type="range" id="sVig" min="0" max="1" step="0.01">
+    </label>
+    <label class="lab check">
+      <input type="checkbox" id="halftoneChk"> Halftone dots
+    </label>
+    <label class="lab">Dot size <span class="val" id="vDots"></span>
+      <input type="range" id="sDots" min="0" max="1" step="0.01">
+    </label>
+
+    <h2>Captions</h2>
+    <label class="lab">Title <input class="field" id="cTitle" type="text"></label>
+    <label class="lab">Script subtitle <input class="field" id="cSubtitle" type="text"></label>
+    <label class="lab">Tagline <input class="field" id="cTagline" type="text"></label>
+    <label class="lab">Quote <input class="field" id="cQuote" type="text"></label>
+    <label class="lab">Quote source <input class="field" id="cQuoteBy" type="text"></label>
+    <label class="lab">Badge text <input class="field" id="cBadge" type="text"></label>
+    <label class="lab">Ribbon text <input class="field" id="cRibbon" type="text"></label>
+    <label class="lab">Volume tag <input class="field" id="cVol" type="text"></label>
+    <label class="lab">Wanted stars <span class="val" id="vStars"></span>
+      <input type="range" id="cStars" min="0" max="5" step="1">
+    </label>
+
+    <h2>Panel Tag</h2>
+    <label class="lab">Place <input class="field" id="tPlace" type="text"></label>
+    <label class="lab">Time <input class="field" id="tTime" type="text"></label>
+    <label class="lab">Sub-line <input class="field" id="tSub" type="text"></label>
+  </aside>
+</main>
+
+<canvas id="shotCanvas" hidden></canvas>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
