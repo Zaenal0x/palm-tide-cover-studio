@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALM TIDE Cover Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">PALM&nbsp;TIDE <span>Cover Studio</span></div>
+  <div class="aspect-group" role="group" aria-label="Cover aspect">
+    <button type="button" data-aspect="16:9" class="btn on">16:9</button>
+    <button type="button" data-aspect="4:5" class="btn">4:5</button>
+    <button type="button" data-aspect="1:1" class="btn">1:1</button>
+  </div>
+  <div class="history-group">
+    <button type="button" id="undoBtn" class="btn">Undo</button>
+    <button type="button" id="redoBtn" class="btn">Redo</button>
+  </div>
+</header>
+
+<main class="studio">
+  <aside class="rail left">
+    <h2>Photos</h2>
+    <div id="thumbs" class="thumbs"></div>
+    <label class="btn block upload">Add photos
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    </label>
+    <button type="button" id="fillAll" class="btn block">Fill all panels</button>
+    <button type="button" id="spread" class="btn block">Spread photos</button>
+    <p class="hint">Click a photo to drop it into the selected panel. Drag photos onto the cover, drag inside a panel to reposition, scroll to zoom, double-click to reset.</p>
+  </aside>
+
+  <section class="stage-wrap">
+    <div id="stage" class="stage">
+      <canvas id="cover" width="960" height="540"></canvas>
+    </div>
+    <p class="hint centre">The grade is baked into every photo — never raw stock under a glossy title.</p>
+  </section>
+
+  <aside class="rail right">
+    <h2>Variants</h2>
+    <div class="row">
+      <button type="button" class="btn grow" data-variant="sunset">Sunset Mosaic</button>
+      <button type="button" class="btn grow" data-variant="neon">Neon Night</button>
+      <button type="button" class="btn grow" data-variant="comic">Comic Ink</button>
+    </div>
+
+    <h2>Layout &amp; Grade</h2>
+    <label class="field">Layout
+      <select id="layoutSel">
+        <option value="mosaic">Mosaic — Character Key Art</option>
+        <option value="hero">Hero + Strip</option>
+        <option value="comic">Comic Quad</option>
+        <option value="grid9">9-Panel Grid</option>
+        <option value="single">1 Panel</option>
+        <option value="duo">2 Panels</option>
+        <option value="trio">3 Panels</option>
+        <option value="quad">4 Panels</option>
+      </select>
+    </label>
+    <label class="field">Grade
+      <select id="gradeSel">
+        <option value="vice">Vice Sunset</option>
+        <option value="neon">Neon Night</option>
+        <option value="golden">Golden Hour</option>
+        <option value="duotone">Duotone Pink/Teal</option>
+        <option value="comic">Comic Ink</option>
+        <option value="posterink">Poster Ink</option>
+        <option value="natural">Natural</option>
+      </select>
+    </label>
+    <label class="field">Grade strength <input type="range" id="sStrength" min="0" max="1" step="0.01"></label>
+    <label class="field">Contrast <input type="range" id="sContrast" min="0.6" max="1.5" step="0.01"></label>
+    <label class="field">Saturation <input type="range" id="sSaturation" min="0" max="2" step="0.01"></label>
+    <label class="field">Grain <input type="range" id="sGrain" min="0" max="1" step="0.01"></label>
+    <label class="field">Vignette <input type="range" id="sVignette" min="0" max="1" step="0.01"></label>
+    <label class="field check">Halftone dots <input type="checkbox" id="halftone"></label>
+    <label class="field">Dot size <input type="range" id="sDots" min="0.3" max="1.6" step="0.01"></label>
+
+    <h2>Lettering</h2>
+    <label class="field">Title <input type="text" id="inTitle"></label>
+    <label class="field">Subtitle <input type="text" id="inSubtitle"></label>
+    <label class="field">Tagline <input type="text" id="inTagline"></label>
+    <label class="field">Quote <input type="text" id="inQuote"></label>
+    <label class="field">Quote source <input type="text" id="inSource"></label>
+    <label class="field">Badge <input type="text" id="inBadge"></label>
+    <label class="field">Ribbon <input type="text" id="inRibbon"></label>
+    <label class="field">Volume <input type="text" id="inVolume"></label>
+    <label class="field">Wanted stars <input type="range" id="inStars" min="0" max="5" step="1"></label>
+
+    <h2 id="panelLabel">Panel 1</h2>
+    <label class="field">Place <input type="text" id="tagPlace"></label>
+    <label class="field">Time <input type="text" id="tagTime"></label>
+    <label class="field">Sub-line <input type="text" id="tagSub"></label>
+
+    <h2>Export PNG</h2>
+    <div class="row">
+      <button type="button" class="btn grow" data-export="1920x1080">1920×1080</button>
+      <button type="button" class="btn grow" data-export="1080x1350">1080×1350</button>
+    </div>
+    <div class="row">
+      <button type="button" class="btn grow" data-export="1080x1080">1080×1080</button>
+      <button type="button" class="btn grow accent" data-export="all">Export all</button>
+    </div>
+  </aside>
+</main>
+
+<script src="src/grade.js"></script>
+<script src="src/layouts.js"></script>
+<script src="src/draw.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
