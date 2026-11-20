@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PALM TIDE Cover Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">PALM TIDE <span>Cover Studio</span></div>
+  <div class="top-actions">
+    <button class="btn" id="undoBtn">Undo</button>
+    <button class="btn" id="redoBtn">Redo</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="col col-left">
+    <h2>Photos</h2>
+    <div id="dropZone" class="dropzone">Drop photos here or click to upload</div>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    <div id="photoLib" class="photo-lib"></div>
+    <div class="row">
+      <button class="btn" id="fillAllBtn">Fill all panels</button>
+      <button class="btn" id="spreadBtn">Spread photos</button>
+    </div>
+    <p class="hint">Click a photo to drop it into the selected panel. Drag on the cover to reposition, scroll to zoom, double-click to reset a panel.</p>
+  </aside>
+
+  <section class="col col-center">
+    <div class="chips" id="layoutChips"></div>
+    <div class="stage-wrap">
+      <canvas id="stage" width="1280" height="800"></canvas>
+    </div>
+    <div class="row center-row">
+      <span class="lbl">Variants</span>
+      <button class="btn" id="variantSunset">Sunset Mosaic</button>
+      <button class="btn" id="variantNeon">Neon Night</button>
+      <button class="btn" id="variantInk">Comic Ink</button>
+    </div>
+  </section>
+
+  <aside class="col col-right">
+    <h2>Captions</h2>
+    <label>Title <input type="text" id="inTitle"></label>
+    <label>Subtitle <input type="text" id="inSubtitle"></label>
+    <label>Tagline <input type="text" id="inTagline"></label>
+    <label>Quote <input type="text" id="inQuote"></label>
+    <label>Quote source <input type="text" id="inQuoteSource"></label>
+    <div class="row">
+      <label class="grow">Badge <input type="text" id="inBadge"></label>
+      <label class="grow">Volume <input type="text" id="inVolume"></label>
+    </div>
+    <label>Ribbon <input type="text" id="inRibbon"></label>
+    <label>Stars <input type="number" id="inStars" min="0" max="8" step="1"></label>
+
+    <h2>Grade</h2>
+    <label>Look
+      <select id="selGrade">
+        <option value="vice">Vice Sunset</option>
+        <option value="neon">Neon Night</option>
+        <option value="golden">Golden Hour</option>
+        <option value="duotone">Duotone Pink/Teal</option>
+        <option value="comic">Comic Ink</option>
+        <option value="poster">Poster Ink</option>
+        <option value="natural">Natural</option>
+      </select>
+    </label>
+    <label>Grade strength <input type="range" id="slStrength" min="0" max="1" step="0.01"></label>
+    <label>Contrast <input type="range" id="slContrast" min="0.6" max="1.5" step="0.01"></label>
+    <label>Saturation <input type="range" id="slSaturation" min="0" max="2" step="0.01"></label>
+    <label>Grain <input type="range" id="slGrain" min="0" max="1" step="0.01"></label>
+    <label>Vignette <input type="range" id="slVignette" min="0" max="1" step="0.01"></label>
+    <label class="check"><input type="checkbox" id="ckHalftone"> Halftone dots</label>
+    <label>Dot amount <input type="range" id="slDots" min="0" max="1.5" step="0.01"></label>
+
+    <h2>Selected panel</h2>
+    <p class="hint" id="panelInfo"></p>
+    <label>Photo
+      <select id="panelPhotoSel"></select>
+    </label>
+    <label>Tag place <input type="text" id="tagPlace"></label>
+    <div class="row">
+      <label class="grow">Tag time <input type="text" id="tagTime"></label>
+      <label class="grow">Tag sub <input type="text" id="tagSub"></label>
+    </div>
+    <button class="btn" id="resetPanelBtn">Reset panel crop</button>
+
+    <h2>Export PNG</h2>
+    <div class="row wrap">
+      <button class="btn primary" id="expSquare">1080 × 1080</button>
+      <button class="btn primary" id="expPortrait">1080 × 1350</button>
+      <button class="btn primary" id="expWide">1920 × 1080</button>
+      <button class="btn primary" id="expAll">Export all</button>
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
